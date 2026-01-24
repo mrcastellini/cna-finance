@@ -82,7 +82,7 @@ function Login({ onLogin }) {
         </form>
       </div>
       <footer style={styles.footer}>
-        Sistema Seguro &copy; 2026
+        CNA Finance by Grupo Gambarini &copy; 2026
       </footer>
     </div>
   );
