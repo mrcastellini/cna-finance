@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "https://mrcastellini.github.io"}})
 db.init_app(app)
 
 # Cria as tabelas automaticamente

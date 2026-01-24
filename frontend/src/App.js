@@ -3,17 +3,20 @@ import axios from 'axios';
 import { Wallet, Send, ShieldCheck, User as UserIcon, LogOut } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import Login from './Login';
+import Register from './Register';
 
 const API_BASE = "https://cna-finance-api.onrender.com/api"; 
 
 function App() {
   const [user, setUser] = useState(null);
+  const [isRegistering, setIsRegistering] = useState(false); // Estado para trocar de tela
   const [activeTab, setActiveTab] = useState('user');
   const [paymentValue, setPaymentValue] = useState('');
   const [loading, setLoading] = useState(false);
 
   // 1. Função de atualização com "Escudo de Segurança"
   const refreshUserData = useCallback(async () => {
+<<<<<<< HEAD
     // Se o usuário deslogou, encerra a função NA HORA para não travar o React
     if (!user || !user.id) return; 
 
@@ -23,6 +26,12 @@ function App() {
       if (user && user.id) {
         setUser(response.data);
       }
+=======
+    if (!user || !user.id) return; 
+    try {
+      const response = await axios.get(`${API_BASE}/user/${user.id}`);
+      if (user && user.id) setUser(response.data);
+>>>>>>> bf97fc9 (Atualização)
     } catch (error) {
       console.error("Erro ao sincronizar saldo.");
     }
@@ -30,11 +39,10 @@ function App() {
 
   // Atualiza saldo quando muda para a aba do usuário
   useEffect(() => {
-    if (user && activeTab === 'user') {
-      refreshUserData();
-    }
+    if (user && activeTab === 'user') refreshUserData();
   }, [activeTab, refreshUserData]);
 
+<<<<<<< HEAD
   // 2. Logout Blindado (Limpa o estado e força o recarregamento)
   const handleLogout = () => {
     setUser(null);
@@ -79,11 +87,40 @@ function App() {
       setUser(userData);
       setActiveTab('user');
     }} />;
+=======
+  // Logout com recarregamento para limpar cache
+  const handleLogout = () => {
+    setUser(null);
+    setIsRegistering(false);
+    window.location.reload(); 
+  };
+
+  // --- LÓGICA DE NAVEGAÇÃO (DESLOGADO) ---
+  if (!user) {
+    if (isRegistering) {
+      return (
+        <Register 
+          onSwitch={() => setIsRegistering(false)} 
+          onRegisterSuccess={() => setIsRegistering(false)} 
+        />
+      );
+    }
+    return (
+      <Login 
+        onLogin={(userData) => {
+          setUser(userData);
+          setActiveTab('user');
+        }} 
+        onSwitch={() => setIsRegistering(true)} 
+      />
+    );
+>>>>>>> bf97fc9 (Atualização)
   }
 
+  // --- DASHBOARD (LOGADO) ---
   return (
     <div style={styles.container}>
-      {/* Navegação Admin */}
+      {/* Navegação Admin (Opcional) */}
       {user.role === 'admin' && (
         <nav style={styles.nav}>
           <button 
@@ -101,11 +138,19 @@ function App() {
         </nav>
       )}
 
+<<<<<<< HEAD
       {/* Header com o "C" Vermelho */}
       <div style={styles.topBar}>
         <div style={styles.logoContainer}>
           <div style={styles.iconC}>C</div>
           <h1 style={styles.logoText}>NA <span style={{color: '#E50136'}}>Finance</span></h1>
+=======
+      {/* Header Fixo */}
+      <div style={styles.topBar}>
+        <div style={styles.logoContainer}>
+          <div style={styles.iconC}>C</div>
+          <h1 style={styles.logoText}>CNA <span style={{color: '#E50136'}}>Finance</span></h1>
+>>>>>>> bf97fc9 (Atualização)
         </div>
         <button onClick={handleLogout} style={styles.logoutBtn}>
           <LogOut size={16} /> Sair
@@ -113,7 +158,7 @@ function App() {
       </div>
 
       {activeTab === 'user' ? (
-        <main style={styles.mainContent}>
+        <main>
           <div style={styles.headerInfo}>
             <span style={styles.welcome}>Olá, {user.username}</span>
             <span style={styles.badge}>{user.role.toUpperCase()}</span>
@@ -137,12 +182,22 @@ function App() {
               style={styles.paymentInput}
             />
             <button 
-              onClick={handlePayment} 
+              onClick={async () => {
+                const val = parseFloat(paymentValue);
+                if (!val || val > user.balance) return alert("Verifique o valor e o saldo.");
+                setLoading(true);
+                try {
+                  await axios.post(`${API_BASE}/user/pay`, { user_id: user.id, value: val });
+                  await refreshUserData();
+                  setPaymentValue('');
+                  alert("Pago!");
+                } catch { alert("Erro"); }
+                finally { setLoading(false); }
+              }} 
               disabled={loading}
               style={{...styles.payButton, opacity: loading ? 0.7 : 1}}
             >
-              <Send size={20} /> 
-              {loading ? 'Processando...' : `Confirmar CNA$ ${paymentValue || '0,00'}`}
+              <Send size={20} /> {loading ? 'Enviando...' : 'Confirmar Pagamento'}
             </button>
           </div>
         </main>
@@ -151,14 +206,18 @@ function App() {
       )}
       
       <footer style={styles.footer}>
-        CNA Finance by Grupo Gambarini &copy; 2026 • Logado como: <strong>{user.username}</strong>
+        CNA Finance by Grupo Gambarini &copy; 2026 • <strong>Versão Final</strong>
       </footer>
     </div>
   );
 }
 
 const styles = {
+<<<<<<< HEAD
   container: { padding: '20px', maxWidth: '450px', margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#0f172a', color: 'white' },
+=======
+  container: { padding: '20px', maxWidth: '450px', margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#0f172a', color: 'white', fontFamily: 'sans-serif' },
+>>>>>>> bf97fc9 (Atualização)
   nav: { display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '25px' },
   tab: { backgroundColor: 'transparent', border: 'none', color: 'white', padding: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' },
   topBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
