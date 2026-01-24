@@ -29,6 +29,13 @@ function App() {
     }
   }, [activeTab, refreshUserData]);
 
+    const handleLogout = () => {
+    setUser(null);          // Remove o usuário do estado
+    setActiveTab('user');   // Reseta a aba para o padrão
+    setPaymentValue('');    // Limpa campos pendentes
+    // Se usar localStorage no futuro, limpe aqui: localStorage.clear();
+  };
+  
   // Função de Pagamento Dinâmico
   const handlePayment = async () => {
     const valueToPay = parseFloat(paymentValue);
