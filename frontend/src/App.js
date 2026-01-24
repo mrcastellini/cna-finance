@@ -4,7 +4,6 @@ import { Wallet, Send, ShieldCheck, User as UserIcon, LogOut } from 'lucide-reac
 import AdminDashboard from './AdminDashboard';
 import Login from './Login';
 
-// Mude para a URL do seu Render após o deploy
 const API_BASE = "https://cna-finance-api.onrender.com/api"; 
 
 function App() {
@@ -13,34 +12,44 @@ function App() {
   const [paymentValue, setPaymentValue] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Sincroniza dados com o servidor
+  // 1. Função de atualização com "Escudo de Segurança"
   const refreshUserData = useCallback(async () => {
-    if (!user) return;
+    // Se o usuário deslogou, encerra a função NA HORA para não travar o React
+    if (!user || !user.id) return; 
+
     try {
       const response = await axios.get(`${API_BASE}/user/${user.id}`);
-      setUser(response.data);
+      // Só atualiza se o usuário ainda estiver logado no momento que a resposta chegar
+      if (user && user.id) {
+        setUser(response.data);
+      }
     } catch (error) {
-      console.error("Erro ao sincronizar dados.");
+      console.error("Erro ao sincronizar saldo.");
     }
   }, [user]);
 
+  // Atualiza saldo quando muda para a aba do usuário
   useEffect(() => {
     if (user && activeTab === 'user') {
       refreshUserData();
     }
   }, [activeTab, refreshUserData]);
 
-  // --- SOLUÇÃO DEFINITIVA PARA O BUG DE LOGOUT ---
+  // 2. Logout Blindado (Limpa o estado e força o recarregamento)
   const handleLogout = () => {
     setUser(null);
-    // Força o navegador a recarregar e limpar o estado do React por completo
-    window.location.reload(); 
+    setActiveTab('user');
+    
+    // Pequeno delay para o React processar o 'null' antes do refresh
+    setTimeout(() => {
+      window.location.reload();
+    }, 10);
   };
 
   const handlePayment = async () => {
     const valueToPay = parseFloat(paymentValue);
     if (isNaN(valueToPay) || valueToPay <= 0) {
-      alert("Por favor, insira um valor válido.");
+      alert("Valor inválido.");
       return;
     }
     if (valueToPay > user.balance) {
@@ -58,15 +67,18 @@ function App() {
       setPaymentValue('');
       alert(`CNA$ ${valueToPay.toFixed(2)} pagos com sucesso!`);
     } catch (error) {
-      alert(error.response?.data?.error || "Erro na transação");
+      alert("Erro na transação");
     } finally {
       setLoading(false);
     }
   };
 
-  // Se não houver usuário, exibe a tela de login
+  // 3. Renderização Condicional (Login sempre em primeiro lugar)
   if (!user) {
-    return <Login onLogin={(userData) => setUser(userData)} />;
+    return <Login onLogin={(userData) => {
+      setUser(userData);
+      setActiveTab('user');
+    }} />;
   }
 
   return (
@@ -89,7 +101,7 @@ function App() {
         </nav>
       )}
 
-      {/* Header com Logo e Logout */}
+      {/* Header com o "C" Vermelho */}
       <div style={styles.topBar}>
         <div style={styles.logoContainer}>
           <div style={styles.iconC}>C</div>
@@ -111,7 +123,7 @@ function App() {
             <p style={styles.label}>Saldo disponível</p>
             <div style={styles.balanceRow}>
               <Wallet color="#E50136" size={32} />
-              <h2 style={styles.balanceValue}>CNA$ {user.balance.toFixed(2)}</h2>
+              <h2 style={styles.balanceValue}>CNA$ {(user.balance || 0).toFixed(2)}</h2>
             </div>
           </div>
 
@@ -139,14 +151,14 @@ function App() {
       )}
       
       <footer style={styles.footer}>
-        CNA Finance &copy; 2026 • Logado como: <strong>{user.username}</strong>
+        CNA Finance by Grupo Gambarini &copy; 2026 • Logado como: <strong>{user.username}</strong>
       </footer>
     </div>
   );
 }
 
 const styles = {
-  container: { padding: '20px', maxWidth: '450px', margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
+  container: { padding: '20px', maxWidth: '450px', margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#0f172a', color: 'white' },
   nav: { display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '25px' },
   tab: { backgroundColor: 'transparent', border: 'none', color: 'white', padding: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' },
   topBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
