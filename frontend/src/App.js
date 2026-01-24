@@ -4,7 +4,7 @@ import { Wallet, Send, ShieldCheck, User as UserIcon, LogOut } from 'lucide-reac
 import AdminDashboard from './AdminDashboard';
 import Login from './Login';
 
-// IMPORTANTE: Quando subir para o Render, substitua pelo link que o Render te der.
+// Mude para a URL do seu Render após o deploy
 const API_BASE = "https://cna-finance-api.onrender.com/api"; 
 
 function App() {
@@ -30,12 +30,11 @@ function App() {
     }
   }, [activeTab, refreshUserData]);
 
-  // --- FUNÇÃO DE LOGOUT (CORRIGE O BUG) ---
+  // --- SOLUÇÃO DEFINITIVA PARA O BUG DE LOGOUT ---
   const handleLogout = () => {
-    setUser(null);          // Remove o usuário do estado
-    setActiveTab('user');   // Reseta a aba para o padrão
-    setPaymentValue('');    // Limpa campos pendentes
-    // Se usar localStorage no futuro, limpe aqui: localStorage.clear();
+    setUser(null);
+    // Força o navegador a recarregar e limpar o estado do React por completo
+    window.location.reload(); 
   };
 
   const handlePayment = async () => {
@@ -65,14 +64,14 @@ function App() {
     }
   };
 
-  // Se não houver usuário, renderiza APENAS a tela de Login
+  // Se não houver usuário, exibe a tela de login
   if (!user) {
     return <Login onLogin={(userData) => setUser(userData)} />;
   }
 
   return (
     <div style={styles.container}>
-      {/* Navegação Admin (Só aparece se role for admin) */}
+      {/* Navegação Admin */}
       {user.role === 'admin' && (
         <nav style={styles.nav}>
           <button 
@@ -90,7 +89,7 @@ function App() {
         </nav>
       )}
 
-      {/* Top Bar com Logo e Logout corrigido */}
+      {/* Header com Logo e Logout */}
       <div style={styles.topBar}>
         <div style={styles.logoContainer}>
           <div style={styles.iconC}>C</div>
@@ -140,7 +139,7 @@ function App() {
       )}
       
       <footer style={styles.footer}>
-        CNA Finance by Grupo Gambarini &copy; 2026 • Logado como: <strong>{user.username}</strong>
+        CNA Finance &copy; 2026 • Logado como: <strong>{user.username}</strong>
       </footer>
     </div>
   );
