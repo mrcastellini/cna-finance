@@ -74,7 +74,7 @@ function AdminDashboard() {
       <header style={styles.header}>
         <div style={styles.titleGroup}>
           <ShieldCheck color="#E50136" size={24} />
-          <h2 style={styles.title}>Gestão de Ativos</h2>
+          <h2 style={styles.title}>Painel Administrativo</h2>
         </div>
         <button onClick={fetchUsers} style={styles.refreshBtn} disabled={loading}>
           <RefreshCw size={16} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />

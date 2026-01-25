@@ -61,6 +61,22 @@ def register():
     db.session.commit()
     return jsonify({"message": "Sucesso"}), 201
 
+@app.route('/api/user/pay', methods=['POST'])
+def user_pay():
+    data = request.json
+    user = User.query.get(data.get('user_id'))
+    value = float(data.get('value', 0))
+
+    if not user:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+    
+    if user.balance < value:
+        return jsonify({"error": "Saldo insuficiente"}), 400
+
+    user.balance -= value
+    db.session.commit()
+    return jsonify({"message": "Sucesso", "new_balance": user.balance}), 200
+
 # --- ROTAS ADMINISTRATIVAS PROTEGIDAS ---
 
 @app.route('/api/admin/users', methods=['GET'])
