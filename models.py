@@ -11,7 +11,7 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
     
     # Define o saldo inicial (CNA$) padrão para novos usuários
-    balance = db.Column(db.Float, default=100.0)
+    balance = db.Column(db.Float, default=0.0)
     
     # Define o papel do usuário (admin ou user)
     role = db.Column(db.String(20), default='user')
