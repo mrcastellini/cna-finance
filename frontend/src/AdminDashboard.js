@@ -1,150 +1,133 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Plus, Minus, UserCheck, XCircle } from 'lucide-react';
+import { Users, RefreshCw, AlertCircle, Database } from 'lucide-react';
 
 const API_BASE = "https://cna-finance-api.onrender.com/api";
 
-const AdminDashboard = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [amount, setAmount] = useState('');
-  const [loading, setLoading] = useState(false);
+function AdminDashboard() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Busca usuários por nome (Correspondência Parcial)
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) return;
+  // Função para buscar todos os usuários do banco
+  const fetchUsers = async () => {
     setLoading(true);
+    setError('');
     try {
-      const response = await axios.get(`${API_BASE}/admin/search-users?name=${searchTerm}`);
-      setSearchResults(response.data);
-      setSelectedUser(null); // Reseta seleção ao buscar novamente
-      if (response.data.length === 0) alert("Nenhum usuário encontrado.");
-    } catch (error) {
-      alert("Erro ao buscar usuários.");
+      const response = await axios.get(`${API_BASE}/admin/users`);
+      setUsers(response.data);
+    } catch (err) {
+      setError('Erro ao carregar lista de usuários. Verifique o servidor.');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Atualiza saldo do usuário selecionado
-  const updateBalance = async (type) => {
-    if (!selectedUser || !amount || parseFloat(amount) <= 0) {
-      alert("Selecione um usuário e insira um valor válido.");
-      return;
-    }
-
-    const value = type === 'add' ? parseFloat(amount) : -parseFloat(amount);
-    
-    try {
-      const response = await axios.post(`${API_BASE}/admin/update-balance`, {
-        user_id: selectedUser.id,
-        amount: value
-      });
-      
-      // Atualiza o estado local para refletir o novo saldo imediatamente
-      setSelectedUser({ ...selectedUser, balance: response.data.new_balance });
-      setAmount('');
-      alert(`Sucesso! Novo saldo de ${selectedUser.username}: CNA$ ${response.data.new_balance.toFixed(2)}`);
-    } catch (error) {
-      alert(error.response?.data?.error || "Erro ao atualizar saldo.");
-    }
-  };
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.title}>Painel de Controle Admin</h3>
-      
-      {/* Barra de Busca */}
-      <div style={styles.searchBox}>
-        <input 
-          placeholder="Digite o nome do usuário..." 
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-          style={styles.input}
-        />
-        <button onClick={handleSearch} style={styles.searchBtn} disabled={loading}>
-          <Search size={18}/>
+      <header style={styles.header}>
+        <div style={styles.titleGroup}>
+          <ShieldCheck color="#E50136" size={24} />
+          <h2 style={styles.title}>Painel Administrativo</h2>
+        </div>
+        <button onClick={fetchUsers} style={styles.refreshBtn} disabled={loading}>
+          <RefreshCw size={16} className={loading ? 'spin' : ''} />
+          {loading ? 'Atualizando...' : 'Atualizar Dados'}
         </button>
+      </header>
+
+      {error && (
+        <div style={styles.errorBox}>
+          <AlertCircle size={20} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <div style={styles.statsRow}>
+        <div style={styles.statCard}>
+          <Users size={20} color="#94a3b8" />
+          <div>
+            <p style={styles.statLabel}>Total de Usuários</p>
+            <p style={styles.statValue}>{users.length}</p>
+          </div>
+        </div>
+        <div style={styles.statCard}>
+          <Database size={20} color="#94a3b8" />
+          <div>
+            <p style={styles.statLabel}>Volume Total</p>
+            <p style={styles.statValue}>
+              CNA$ {users.reduce((acc, u) => acc + (u.balance || 0), 0).toFixed(2)}
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Lista de Resultados (Aparece apenas se houver busca e nenhum selecionado) */}
-      {searchResults.length > 0 && !selectedUser && (
-        <div style={styles.resultsList}>
-          <p style={styles.helperText}>Resultados encontrados:</p>
-          {searchResults.map(u => (
-            <div key={u.id} onClick={() => setSelectedUser(u)} style={styles.resultItem}>
-              <div>
-                <span style={styles.resName}>{u.username}</span>
-                <span style={styles.resId}> (ID: {u.id})</span>
-              </div>
-              <UserCheck size={18} color="var(--secondary)"/>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Painel de Ajuste (Só aparece quando um usuário é clicado) */}
-      {selectedUser && (
-        <div style={styles.controlCard}>
-          <div style={styles.cardHeader}>
-            <h4 style={styles.userName}>{selectedUser.username}</h4>
-            <button onClick={() => setSelectedUser(null)} style={styles.closeBtn}>
-              <XCircle size={20} />
-            </button>
-          </div>
-          
-          <div style={styles.balanceInfo}>
-            <span style={styles.label}>Saldo Atual:</span>
-            <span style={styles.value}>CNA$ {selectedUser.balance.toFixed(2)}</span>
-          </div>
-
-          <div style={styles.actionGroup}>
-            <input 
-              type="number" 
-              placeholder="0,00" 
-              value={amount} 
-              onChange={(e) => setAmount(e.target.value)}
-              style={styles.amountInput}
-            />
-            <div style={styles.btnRow}>
-              <button onClick={() => updateBalance('add')} style={styles.addBtn}>
-                <Plus size={16}/> Adicionar
-              </button>
-              <button onClick={() => updateBalance('remove')} style={styles.remBtn}>
-                <Minus size={16}/> Remover
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div style={styles.tableContainer}>
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              <th style={styles.th}>ID</th>
+              <th style={styles.th}>Usuário</th>
+              <th style={styles.th}>Papel</th>
+              <th style={styles.th}>Saldo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((u) => (
+              <tr key={u.id} style={styles.tr}>
+                <td style={styles.td}>#{u.id}</td>
+                <td style={{...styles.td, fontWeight: 'bold'}}>{u.username}</td>
+                <td style={styles.td}>
+                  <span style={{
+                    ...styles.badge, 
+                    backgroundColor: u.role === 'admin' ? '#E50136' : '#334155'
+                  }}>
+                    {u.role.toUpperCase()}
+                  </span>
+                </td>
+                <td style={{...styles.td, color: '#10b981', fontWeight: 'bold'}}>
+                  CNA$ {u.balance.toFixed(2)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {users.length === 0 && !loading && (
+          <p style={styles.emptyMsg}>Nenhum usuário cadastrado no sistema.</p>
+        )}
+      </div>
     </div>
   );
-};
+}
+
+// Ícone importado localmente para o exemplo
+const ShieldCheck = ({color, size}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+);
 
 const styles = {
-  container: { backgroundColor: 'var(--card-bg)', padding: '20px', borderRadius: '24px', boxShadow: '0 10px 20px rgba(0,0,0,0.2)' },
-  title: { color: 'var(--secondary)', marginBottom: '20px', fontSize: '18px' },
-  searchBox: { display: 'flex', gap: '10px', marginBottom: '20px' },
-  input: { flex: 1, padding: '12px', borderRadius: '12px', border: '1px solid #334155', backgroundColor: '#0f172a', color: 'white', outline: 'none' },
-  searchBtn: { backgroundColor: 'var(--secondary)', border: 'none', borderRadius: '12px', padding: '0 15px', color: 'white', cursor: 'pointer' },
-  helperText: { fontSize: '12px', color: 'var(--neutral)', marginBottom: '10px' },
-  resultsList: { backgroundColor: '#0f172a', borderRadius: '12px', overflow: 'hidden' },
-  resultItem: { display: 'flex', justifyContent: 'space-between', padding: '15px', borderBottom: '1px solid #1e293b', cursor: 'pointer', transition: '0.2s', ':hover': { backgroundColor: '#1e293b' } },
-  resName: { color: 'white', fontWeight: 'bold' },
-  resId: { color: 'var(--neutral)', fontSize: '12px' },
-  controlCard: { padding: '20px', borderRadius: '16px', border: '1px solid var(--secondary)', backgroundColor: '#1e293b', marginTop: '10px' },
-  cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' },
-  userName: { color: 'white', margin: 0, fontSize: '20px' },
-  closeBtn: { background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' },
-  balanceInfo: { marginBottom: '20px', display: 'flex', flexDirection: 'column' },
-  label: { color: 'var(--neutral)', fontSize: '12px' },
-  value: { color: '#22c55e', fontSize: '24px', fontWeight: '800' },
-  amountInput: { width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #334155', backgroundColor: '#0f172a', color: 'white', marginBottom: '15px', fontSize: '18px', textAlign: 'center', boxSizing: 'border-box' },
-  btnRow: { display: 'flex', gap: '10px' },
-  addBtn: { flex: 1, padding: '12px', backgroundColor: '#22c55e', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', fontWeight: 'bold' },
-  remBtn: { flex: 1, padding: '12px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', fontWeight: 'bold' }
+  container: { marginTop: '10px', animation: 'fadeIn 0.5s ease' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' },
+  titleGroup: { display: 'flex', alignItems: 'center', gap: '10px' },
+  title: { fontSize: '18px', margin: 0, color: 'white' },
+  refreshBtn: { display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#1e293b', border: '1px solid #334155', color: '#94a3b8', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' },
+  errorBox: { backgroundColor: 'rgba(229, 1, 54, 0.1)', color: '#E50136', padding: '15px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', border: '1px solid #E50136' },
+  statsRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' },
+  statCard: { backgroundColor: '#1e293b', padding: '15px', borderRadius: '15px', display: 'flex', alignItems: 'center', gap: '12px' },
+  statLabel: { color: '#94a3b8', fontSize: '11px', margin: 0 },
+  statValue: { color: 'white', fontSize: '16px', fontWeight: 'bold', margin: 0 },
+  tableContainer: { backgroundColor: '#1e293b', borderRadius: '20px', overflow: 'hidden' },
+  table: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
+  th: { textAlign: 'left', padding: '15px', backgroundColor: '#334155', color: '#cbd5e1', fontWeight: '600' },
+  tr: { borderBottom: '1px solid #334155' },
+  td: { padding: '15px', color: '#f8fafc' },
+  badge: { padding: '2px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' },
+  emptyMsg: { textAlign: 'center', padding: '30px', color: '#475569' }
 };
 
 export default AdminDashboard;

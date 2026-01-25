@@ -17,8 +17,8 @@ const Register = ({ onSwitch, onRegisterSuccess }) => {
 
     try {
       await axios.post(`${API_BASE}/register`, { username, password });
-      alert("Conta criada com sucesso! Agora faça seu login.");
-      onRegisterSuccess(); // Chama a função que volta para o login no App.js
+      alert("Conta criada com sucesso! Agora você pode entrar.");
+      onRegisterSuccess(); // Volta automaticamente para a tela de login
     } catch (error) {
       setError(error.response?.data?.error || "Erro ao registrar usuário");
     } finally {
@@ -32,7 +32,7 @@ const Register = ({ onSwitch, onRegisterSuccess }) => {
         <div style={styles.logoSection}>
           <div style={styles.iconC}>C</div>
           <h1 style={styles.logoText}>CNA <span style={{color: '#E50136'}}>Finance</span></h1>
-          <p style={styles.subtitle}>Crie sua conta gratuita</p>
+          <p style={styles.subtitle}>Cadastre-se para ganhar seus primeiros CNA$</p>
         </div>
 
         <form onSubmit={handleRegister} style={styles.form}>
@@ -47,7 +47,7 @@ const Register = ({ onSwitch, onRegisterSuccess }) => {
             <User size={20} color="#94a3b8" style={styles.inputIcon} />
             <input 
               type="text" 
-              placeholder="Escolha um usuário" 
+              placeholder="Escolha um nome de usuário" 
               value={username}
               onChange={e => setUsername(e.target.value)} 
               style={styles.input} 
@@ -59,7 +59,7 @@ const Register = ({ onSwitch, onRegisterSuccess }) => {
             <Lock size={20} color="#94a3b8" style={styles.inputIcon} />
             <input 
               type="password" 
-              placeholder="Crie uma senha" 
+              placeholder="Crie uma senha forte" 
               value={password}
               onChange={e => setPassword(e.target.value)} 
               style={styles.input} 
@@ -72,23 +72,25 @@ const Register = ({ onSwitch, onRegisterSuccess }) => {
             disabled={loading}
             style={{...styles.button, opacity: loading ? 0.7 : 1}}
           >
-            <UserPlus size={18} /> {loading ? 'Registrando...' : 'Criar minha conta'}
+            <UserPlus size={18} /> 
+            {loading ? 'Criando conta...' : 'Cadastrar agora'}
           </button>
 
           <button type="button" onClick={onSwitch} style={styles.backBtn}>
-            <ArrowLeft size={16} /> Já tenho uma conta
+            <ArrowLeft size={16} /> Já sou cadastrado
           </button>
         </form>
       </div>
+      
       <footer style={styles.footer}>
-        CNA Finance by Grupo Gambarini &copy; 2026
+        Processamento Seguro &copy; 2026
       </footer>
     </div>
   );
 };
 
 const styles = {
-  container: { height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f172a', padding: '20px' },
+  container: { height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f172a', padding: '20px', fontFamily: 'sans-serif' },
   card: { width: '100%', maxWidth: '400px', backgroundColor: '#1e293b', padding: '40px', borderRadius: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)', textAlign: 'center' },
   logoSection: { marginBottom: '30px' },
   iconC: { backgroundColor: '#0f172a', color: '#E50136', width: '50px', height: '50px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', fontWeight: '900', border: '2px solid #E50136', margin: '0 auto 15px' },

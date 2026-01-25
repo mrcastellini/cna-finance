@@ -1,33 +1,31 @@
+Para o seu package.json no frontend, o segredo é garantir que ele tenha o campo homepage (para o GitHub Pages saber onde morar) e os scripts de deploy configurados.
+
+Como você está usando ícones da Lucide, precisamos ter certeza de que ela está listada nas dependências.
+
+frontend/package.json
+JSON
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "cna-finance-frontend",
+  "version": "1.0.0",
   "private": true,
   "homepage": "https://mrcastellini.github.io/cna-finance",
   "dependencies": {
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.13.2",
-    "lucide-react": "^0.563.0",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "axios": "^1.6.0",
+    "lucide-react": "^0.284.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1"
   },
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
   },
   "browserslist": {
     "production": [
@@ -40,8 +38,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "gh-pages": "^6.3.0"
   }
 }
