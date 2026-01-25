@@ -83,7 +83,7 @@ const Register = ({ onSwitch, onRegisterSuccess }) => {
       </div>
       
       <footer style={styles.footer}>
-        Processamento Seguro &copy; 2026
+        CNA Finance by Grupo Gambarini &copy; 2026
       </footer>
     </div>
   );

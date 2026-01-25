@@ -36,7 +36,7 @@ function Login({ onLogin, onSwitch }) {
         <div style={styles.logoSection}>
           <div style={styles.iconC}>C</div>
           <h1 style={styles.logoText}>CNA <span style={{color: '#E50136'}}>Finance</span></h1>
-          <p style={styles.subtitle}>Acesse sua conta para gerenciar CNA$</p>
+          <p style={styles.subtitle}>Acesse sua conta para gerenciar seus CNA$</p>
         </div>
 
         {/* Formulário */}
@@ -92,7 +92,7 @@ function Login({ onLogin, onSwitch }) {
       </div>
       
       <footer style={styles.footer}>
-        Sistema Seguro &copy; 2026
+        CNA Finance by Grupo Gambarini &copy; 2026
       </footer>
     </div>
   );

@@ -161,7 +161,7 @@ function App() {
       )}
       
       <footer style={styles.footer}>
-        CNA Finance &copy; 2026 • Logado como: <strong>{user.username}</strong>
+        CNA Finance by Grupo Gambarini &copy; 2026 • Logado como: <strong>{user.username}</strong>
       </footer>
     </div>
   );
