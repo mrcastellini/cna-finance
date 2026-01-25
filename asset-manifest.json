@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/cna-finance/static/css/main.78cbdb82.css",
-    "main.js": "/cna-finance/static/js/main.fb5ea64f.js",
+    "main.js": "/cna-finance/static/js/main.2b4385ec.js",
     "static/js/453.409a26d9.chunk.js": "/cna-finance/static/js/453.409a26d9.chunk.js",
     "index.html": "/cna-finance/index.html",
     "main.78cbdb82.css.map": "/cna-finance/static/css/main.78cbdb82.css.map",
-    "main.fb5ea64f.js.map": "/cna-finance/static/js/main.fb5ea64f.js.map",
+    "main.2b4385ec.js.map": "/cna-finance/static/js/main.2b4385ec.js.map",
     "453.409a26d9.chunk.js.map": "/cna-finance/static/js/453.409a26d9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.78cbdb82.css",
-    "static/js/main.fb5ea64f.js"
+    "static/js/main.2b4385ec.js"
   ]
 }
