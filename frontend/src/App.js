@@ -5,7 +5,6 @@ import AdminDashboard from './AdminDashboard';
 import Login from './Login';
 import Register from './Register';
 
-// Substitua pela sua URL do Render quando o serviço estiver "Live"
 const API_BASE = "https://cna-finance-api.onrender.com/api"; 
 
 function App() {
@@ -15,61 +14,88 @@ function App() {
   const [paymentValue, setPaymentValue] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Sincroniza dados com o servidor com proteção contra deslogue
+  // --- ALTERAÇÃO DE OURO 1: PERSISTÊNCIA AO CARREGAR ---
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  // Sincroniza dados com a NOVA ROTA do servidor
   const refreshUserData = useCallback(async () => {
     if (!user || !user.id) return; 
     try {
+      // Usando a nova rota individual para pegar o saldo atualizado pelo Admin
       const response = await axios.get(`${API_BASE}/user/${user.id}`);
-      if (user && user.id) {
-        setUser(response.data);
+      if (response.data && response.data.balance !== user.balance) {
+        const updatedUser = { ...user, balance: response.data.balance };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
       }
     } catch (error) {
       console.error("Erro ao sincronizar saldo.");
     }
   }, [user]);
 
-  // Atualiza saldo quando o usuário está na aba principal
+  // --- ALTERAÇÃO DE OURO: ATUALIZAÇÃO AUTOMÁTICA (POLLING) ---
   useEffect(() => {
     if (user && activeTab === 'user') {
-      refreshUserData();
-    }
-  }, [activeTab, refreshUserData]);
+      refreshUserData(); // Atualiza ao entrar
 
-  // Função de Logout - Recarrega a página para limpar o estado do React
+      // Checa o saldo a cada 10 segundos para ver se o Admin adicionou dinheiro
+      const interval = setInterval(refreshUserData, 10000); 
+      return () => clearInterval(interval);
+    }
+  }, [activeTab, user?.id, refreshUserData]);
+
   const handleLogout = () => {
+    localStorage.removeItem('user'); 
     setUser(null);
     setIsRegistering(false);
     window.location.reload(); 
   };
 
   const handlePayment = async () => {
-    const valueToPay = parseFloat(paymentValue);
-    if (isNaN(valueToPay) || valueToPay <= 0) {
-      alert("Por favor, insira um valor válido.");
+    const amount = parseFloat(paymentValue);
+
+    if (!user || isNaN(amount) || amount <= 0) {
+      alert("Digite um valor válido.");
       return;
     }
-    if (valueToPay > user.balance) {
-      alert("Saldo insuficiente.");
+
+    if (user.balance < amount) {
+      alert("Saldo insuficiente para esta transação.");
       return;
     }
 
     setLoading(true);
     try {
-      await axios.post(`${API_BASE}/user/pay`, { 
-        user_id: user.id, 
-        value: valueToPay 
+      const response = await axios.post(`${API_BASE}/user/pay`, {
+        user_id: user.id,
+        value: amount
       });
-      await refreshUserData(); 
-      setPaymentValue('');
-      alert(`CNA$ ${valueToPay.toFixed(2)} pagos com sucesso!`);
-    } catch (error) {
-      alert(error.response?.data?.error || "Erro na transação");
+
+      if (response.status === 200) {
+        const updatedUser = { 
+          ...user, 
+          balance: response.data.new_balance 
+        };
+        
+        setUser(updatedUser); 
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+
+        alert(`Pagamento de CNA$ ${amount.toFixed(2)} realizado!`);
+        setPaymentValue(''); 
+      }
+    } catch (err) {
+      console.error("Erro na transação:", err);
+      alert(err.response?.data?.error || "Erro ao processar pagamento.");
     } finally {
       setLoading(false);
     }
   };
 
-  // --- LÓGICA DE TELAS (DESLOGADO) ---
   if (!user) {
     if (isRegistering) {
       return (
@@ -83,6 +109,7 @@ function App() {
       <Login 
         onLogin={(userData) => {
           setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
           setActiveTab('user');
         }} 
         onSwitch={() => setIsRegistering(true)} 
@@ -90,10 +117,8 @@ function App() {
     );
   }
 
-  // --- DASHBOARD (LOGADO) ---
   return (
     <div style={styles.container}>
-      {/* Navegação Admin (Aparece apenas para administradores) */}
       {user.role === 'admin' && (
         <nav style={styles.nav}>
           <button 
@@ -111,7 +136,6 @@ function App() {
         </nav>
       )}
 
-      {/* Top Bar com Logo e Botão de Sair */}
       <div style={styles.topBar}>
         <div style={styles.logoContainer}>
           <div style={styles.iconC}>C</div>
