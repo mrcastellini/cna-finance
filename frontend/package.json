@@ -2,7 +2,7 @@
   "name": "cna-finance-frontend",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://mrcastellini.github.io/cna-finance",
+  "homepage": "http://cnafinance.duckdns.org",
   "dependencies": {
     "axios": "^1.6.0",
     "lucide-react": "^0.284.0",
