@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, User
 import os
+import json # Adicionado para suporte ao backup
 
 app = Flask(__name__)
 CORS(app)
@@ -42,7 +43,6 @@ def login():
         }), 200
     return jsonify({"error": "Credenciais inválidas"}), 401
 
-# --- NOVA ROTA: NECESSÁRIA PARA O REFRESH AUTOMÁTICO ---
 @app.route('/api/user/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     user = User.query.get(user_id)
@@ -123,6 +123,29 @@ def update_balance():
         
     db.session.commit()
     return jsonify({"message": "Saldo atualizado", "new_balance": user.balance}), 200
+
+# --- NOVA ROTA: BACKUP/EXPORTAÇÃO PARA JSON ---
+@app.route('/api/admin/export-db', methods=['GET'])
+def export_db():
+    token = request.headers.get('X-Admin-Token')
+    if token != ADMIN_SECRET_KEY:
+        return jsonify({"error": "Acesso negado"}), 403
+    
+    users = User.query.all()
+    # Gera uma lista de dicionários para o JSON
+    data = [{
+        "id": u.id,
+        "username": u.username,
+        "password": u.password,
+        "balance": u.balance,
+        "role": u.role
+    } for u in users]
+    
+    return jsonify({
+        "info": "Backup CNA Finance 2026",
+        "total_users": len(data),
+        "data": data
+    }), 200
 
 @app.route('/api/make-me-admin/<username>', methods=['GET'])
 def make_me_admin(username):
