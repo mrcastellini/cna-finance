@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/itaimpaulista/static/css/main.78cbdb82.css",
-    "main.js": "/itaimpaulista/static/js/main.5fd34426.js",
+    "main.js": "/itaimpaulista/static/js/main.4d2cc35f.js",
     "static/js/453.409a26d9.chunk.js": "/itaimpaulista/static/js/453.409a26d9.chunk.js",
     "index.html": "/itaimpaulista/index.html",
     "main.78cbdb82.css.map": "/itaimpaulista/static/css/main.78cbdb82.css.map",
-    "main.5fd34426.js.map": "/itaimpaulista/static/js/main.5fd34426.js.map",
+    "main.4d2cc35f.js.map": "/itaimpaulista/static/js/main.4d2cc35f.js.map",
     "453.409a26d9.chunk.js.map": "/itaimpaulista/static/js/453.409a26d9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.78cbdb82.css",
-    "static/js/main.5fd34426.js"
+    "static/js/main.4d2cc35f.js"
   ]
 }
