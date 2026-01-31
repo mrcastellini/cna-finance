@@ -25,7 +25,7 @@ jobs:
           
           # 3. Encripta o arquivo usando a senha do Secret
           # O comando gera o arquivo 'backup_tucuruvi.json.gpg'
-          echo "${{ secrets.BACKUP_PASSWORD }}" | gpg --batch --yes --passphrase-fd 0 -c backup_temp.json
+          echo "${{ secrets.BACKUP_PASSWORD }}" | gpg --batch --yes --passphrase-fd 0 -c backup_tucuruvi.json
           
           # 4. Apaga o JSON original (não queremos ele no histórico!)
           rm backup_tucuruvi.json
