@@ -20,6 +20,6 @@ jobs:
         run: |
           git config --global user.name "Backup Bot"
           git config --global user.email "bot@github.com"
-          git add backup_dados.json
+          git add backup_dados_tucuruvi.json
           git commit -m "Backup automático: $(date)"
           git push
