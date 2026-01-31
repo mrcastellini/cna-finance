@@ -2,16 +2,24 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, User
 import os
-import json # Adicionado para suporte ao backup
+import json
+from dotenv import load_dotenv
+
+# Carrega variáveis do arquivo .env (apenas para teste local)
+load_dotenv()
 
 app = Flask(__name__)
+
+# --- CONFIGURAÇÃO DE SEGURANÇA (CORS) ---
+# Substitua pelo seu domínio final quando o SSL estiver ativo
 CORS(app)
 
-# --- CONFIGURAÇÃO DE SEGURANÇA ---
-ADMIN_SECRET_KEY = "CNA_KEY_2026_SEGURA"
+# --- CHAVES SECRETAS (ESCONDIDAS) ---
+# Se não encontrar no sistema, usa um valor padrão (apenas para dev)
+ADMIN_SECRET_KEY = os.getenv("MINHA_API_KEY")
 
 # --- CONFIGURAÇÃO DO BANCO DE DADOS ---
-database_url = os.getenv('DATABASE_URL')
+database_url = os.getenv('BANCO_URL')
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 else:
@@ -124,7 +132,7 @@ def update_balance():
     db.session.commit()
     return jsonify({"message": "Saldo atualizado", "new_balance": user.balance}), 200
 
-# --- NOVA ROTA: BACKUP/EXPORTAÇÃO PARA JSON ---
+# --- ROTA DE BACKUP ---
 @app.route('/api/admin/export-db', methods=['GET'])
 def export_db():
     token = request.headers.get('X-Admin-Token')
@@ -132,7 +140,6 @@ def export_db():
         return jsonify({"error": "Acesso negado"}), 403
     
     users = User.query.all()
-    # Gera uma lista de dicionários para o JSON
     data = [{
         "id": u.id,
         "username": u.username,
