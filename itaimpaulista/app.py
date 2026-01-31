@@ -154,6 +154,42 @@ def export_db():
         "data": data
     }), 200
 
+@app.route('/api/admin/import-db', methods=['POST'])
+def import_db():
+    token = request.headers.get('X-Admin-Token')
+    if token != ADMIN_SECRET_KEY:
+        return jsonify({"error": "Acesso negado"}), 403
+    
+    backup_completo = request.json
+    
+    # Validação: verifica se a chave 'data' existe (onde estão os usuários)
+    if not backup_completo or 'data' not in backup_completo:
+        return jsonify({"error": "Formato de backup inválido. Chave 'data' não encontrada."}), 400
+
+    try:
+        # 1. Limpa os usuários atuais
+        User.query.delete()
+        
+        # 2. Pega apenas a lista dentro de 'data'
+        lista_usuarios = backup_completo['data']
+        
+        for user_data in lista_usuarios:
+            new_user = User(
+                id=user_data.get('id'),
+                username=user_data.get('username'),
+                password=user_data.get('password'),
+                balance=user_data.get('balance'),
+                role=user_data.get('role')
+            )
+            db.session.add(new_user)
+        
+        db.session.commit()
+        return jsonify({"message": f"Sucesso! {len(lista_usuarios)} usuários restaurados."}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
+
 @app.route('/api/make-me-admin/<username>', methods=['GET'])
 def make_me_admin(username):
     user = User.query.filter_by(username=username).first()
