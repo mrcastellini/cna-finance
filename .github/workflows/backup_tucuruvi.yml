@@ -34,6 +34,6 @@ jobs:
         run: |
           git config --global user.name "Backup Bot"
           git config --global user.email "bot@github.com"
-          git add backup_dados_tucuruvi.json.gpg
+          git add backup_tucuruvi.json.gpg
           git commit -m "Backup Encriptado: $(date)" || echo "Sem mudanças nos dados"
           git push origin main
