@@ -16,12 +16,12 @@ jobs:
       - name: Baixar Dados e Encriptar
         run: |
           # 1. Acorda o Render e espera ele subir
-          curl -s ${{ vars.RENDER_API_URL }}/api/health > /dev/null
+          curl -s ${{ vars.RENDER_API_URL_TUCURUVI }}/api/health > /dev/null
           sleep 30
           
           # 2. Baixa o JSON temporariamente
           curl -H "X-Admin-Token: ${{ secrets.MINHA_API_KEY }}" \
-          ${{ vars.RENDER_API_URL }}/api/admin/export-db > backup_tucuruvi.json
+          ${{ vars.RENDER_API_URL_TUCURUVI }}/api/admin/export-db > backup_tucuruvi.json
           
           # 3. Encripta o arquivo usando a senha do Secret
           # O comando gera o arquivo 'backup_tucuruvi.json.gpg'
