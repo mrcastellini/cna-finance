@@ -1,0 +1,39 @@
+name: Backup de Dados - Tremembé
+on:
+  schedule:
+    - cron: '0 0 * * *' # Todo dia à meia-noite
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Baixar Dados e Encriptar
+        run: |
+          # 1. Acorda o Render e espera ele subir
+          curl -s ${{ vars.RENDER_API_URL_TREMEMBE }}/api/health > /dev/null
+          sleep 30
+          
+          # 2. Baixa o JSON temporariamente
+          curl -H "X-Admin-Token: ${{ secrets.MINHA_API_KEY }}" \
+          ${{ vars.RENDER_API_URL_TREMEMBE }}/api/admin/export-db > backup_tremembe.json
+          
+          # 3. Encripta usando printf para garantir que a senha seja pura (sem \n)
+          # O printf "%s" envia a senha exata do Secret para o GPG
+          printf "%s" "${{ secrets.BACKUP_PASSWORD }}" | gpg --batch --yes --passphrase-fd 0 -c backup_tremembe.json
+          
+          # 4. Apaga o JSON original
+          rm backup_tremembe.json
+
+      - name: Push do Backup Protegido
+        run: |
+          git config --global user.name "Backup Bot"
+          git config --global user.email "bot@github.com"
+          git add backup_tremembe.json.gpg
+          git commit -m "Backup Encriptado: $(date)" || echo "Sem mudanças nos dados"
+          git push origin main
