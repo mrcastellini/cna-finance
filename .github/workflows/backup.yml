@@ -14,7 +14,7 @@ jobs:
       - name: Baixar dados da API
         run: |
           curl -H "X-Admin-Token: ${{ secrets.MINHA_API_KEY }}" \
-          https://seu-app-no-render.onrender.com/api/admin/export-db > backup_dados.json
+          https://cna-finance-api.onrender.com/api/admin/export-db > backup_dados.json
 
       - name: Salvar backup no repositório
         run: |
