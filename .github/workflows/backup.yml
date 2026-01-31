@@ -1,0 +1,25 @@
+name: Backup do Banco de Dados
+on:
+  schedule:
+    - cron: '0 0 * * *' # Roda todo dia à meia-noite
+  workflow_dispatch: # Permite rodar manualmente para testar
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Baixar dados da API
+        run: |
+          curl -H "X-Admin-Token: ${{ secrets.MINHA_API_KEY }}" \
+          https://seu-app-no-render.onrender.com/api/admin/export-db > backup_dados.json
+
+      - name: Salvar backup no repositório
+        run: |
+          git config --global user.name "Backup Bot"
+          git config --global user.email "bot@github.com"
+          git add backup_dados.json
+          git commit -m "Backup automático: $(date)"
+          git push
