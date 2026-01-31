@@ -7,7 +7,7 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    permissions: # Garante que o robô pode escrever no repo
+    permissions:
       contents: write
     steps:
       - name: Checkout
@@ -23,11 +23,11 @@ jobs:
           curl -H "X-Admin-Token: ${{ secrets.MINHA_API_KEY }}" \
           ${{ vars.RENDER_API_URL_TUCURUVI }}/api/admin/export-db > backup_tucuruvi.json
           
-          # 3. Encripta o arquivo usando a senha do Secret
-          # O comando gera o arquivo 'backup_tucuruvi.json.gpg'
-          echo "${{ secrets.BACKUP_PASSWORD }}" | gpg --batch --yes --passphrase-fd 0 -c backup_tucuruvi.json
+          # 3. Encripta usando printf para garantir que a senha seja pura (sem \n)
+          # O printf "%s" envia a senha exata do Secret para o GPG
+          printf "%s" "${{ secrets.BACKUP_PASSWORD }}" | gpg --batch --yes --passphrase-fd 0 -c backup_tucuruvi.json
           
-          # 4. Apaga o JSON original (não queremos ele no histórico!)
+          # 4. Apaga o JSON original
           rm backup_tucuruvi.json
 
       - name: Push do Backup Protegido
