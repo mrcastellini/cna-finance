@@ -100,7 +100,7 @@ def health_check():
         return jsonify({"error": "Acesso negado"}), 403
 
     try:
-    return jsonify({"status": "alive"}), 200
+        return jsonify({"status": "alive"}), 200
     
 @app.route('/api/admin/users', methods=['GET'])
 def list_users():
@@ -207,3 +207,4 @@ if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
 
     app.run(host='0.0.0.0', port=port)
+
