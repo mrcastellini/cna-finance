@@ -92,6 +92,7 @@ def user_pay():
     return jsonify({"message": "Sucesso", "new_balance": user.balance}), 200
 
 # --- ROTAS ADMINISTRATIVAS PROTEGIDAS ---
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     token = request.headers.get('X-Admin-Token')
@@ -206,3 +207,4 @@ if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
 
     app.run(host='0.0.0.0', port=port)
+
