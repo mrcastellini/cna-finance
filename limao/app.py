@@ -33,12 +33,16 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# --- ROTA DE SAÚDE ---
+# --- ROTAS DE AUTENTICAÇÃO E USUÁRIO ---
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    return jsonify({"status": "alive"}), 200
+    token = request.headers.get('X-Admin-Token')
+    if token != ADMIN_SECRET_KEY:
+        return jsonify({"error": "Acesso negado"}), 403
 
-# --- ROTAS DE AUTENTICAÇÃO E USUÁRIO ---
+    try:
+    return jsonify({"status": "alive"}), 200
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -201,4 +205,5 @@ def make_me_admin(username):
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+
     app.run(host='0.0.0.0', port=port)
