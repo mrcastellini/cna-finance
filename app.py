@@ -99,7 +99,7 @@ def health_check():
     if token != ADMIN_SECRET_KEY:
         return jsonify({"error": "Acesso negado"}), 403
 
-    try:
+try:
     return jsonify({"status": "alive"}), 200
     
 @app.route('/api/admin/users', methods=['GET'])
@@ -207,4 +207,5 @@ if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
 
     app.run(host='0.0.0.0', port=port)
+
 
