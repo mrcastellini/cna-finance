@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/tremembe/static/css/main.78cbdb82.css",
+    "main.js": "/tremembe/static/js/main.6ab872c6.js",
+    "static/js/453.409a26d9.chunk.js": "/tremembe/static/js/453.409a26d9.chunk.js",
+    "index.html": "/tremembe/index.html",
+    "main.78cbdb82.css.map": "/tremembe/static/css/main.78cbdb82.css.map",
+    "main.6ab872c6.js.map": "/tremembe/static/js/main.6ab872c6.js.map",
+    "453.409a26d9.chunk.js.map": "/tremembe/static/js/453.409a26d9.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.78cbdb82.css",
+    "static/js/main.6ab872c6.js"
+  ]
+}
