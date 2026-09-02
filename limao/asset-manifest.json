@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/limao/static/css/main.78cbdb82.css",
+    "main.js": "/limao/static/js/main.3597d431.js",
+    "static/js/488.5c0dc6d1.chunk.js": "/limao/static/js/488.5c0dc6d1.chunk.js",
+    "index.html": "/limao/index.html",
+    "main.78cbdb82.css.map": "/limao/static/css/main.78cbdb82.css.map",
+    "main.3597d431.js.map": "/limao/static/js/main.3597d431.js.map",
+    "488.5c0dc6d1.chunk.js.map": "/limao/static/js/488.5c0dc6d1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.78cbdb82.css",
+    "static/js/main.3597d431.js"
+  ]
+}
